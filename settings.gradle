@@ -1,0 +1,1 @@
+include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher'
