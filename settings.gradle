@@ -1,1 +1,1 @@
-include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher', ':BorderRadius'
+include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher', ':BorderRadius', ':hideapp'
