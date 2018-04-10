@@ -1,4 +1,4 @@
-package com.dovar.dlauncher;
+package com.dovar.common.adapter;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -14,13 +14,13 @@ import android.widget.TextView;
  * Email:xiaohe0949@163.com
  * 通用RecyclerView的ViewHolder
  */
-public class RCommenViewHolder extends RecyclerView.ViewHolder {
+public class RCommonViewHolder extends RecyclerView.ViewHolder {
 
     private SparseArray<View> mViews;
     private View mConvertView;
 
 
-    public RCommenViewHolder(View itemView) {
+    public RCommonViewHolder(View itemView) {
         super(itemView);
         mConvertView = itemView;
         mViews = new SparseArray<View>();
@@ -47,19 +47,19 @@ public class RCommenViewHolder extends RecyclerView.ViewHolder {
         return (T) view;
     }
 
-    public RCommenViewHolder setText(int viewId, String text) {
+    public RCommonViewHolder setText(int viewId, String text) {
         TextView tv = getView(viewId);
         tv.setText(text);
         return this;
     }
 
-    public RCommenViewHolder setImageResource(int viewId, int resId) {
+    public RCommonViewHolder setImageResource(int viewId, int resId) {
         ImageView view = getView(viewId);
         view.setImageResource(resId);
         return this;
     }
 
-    public RCommenViewHolder setImageDrawable(int viewId, Drawable drawable) {
+    public RCommonViewHolder setImageDrawable(int viewId, Drawable drawable) {
         ImageView view = getView(viewId);
         if (view != null) {
             view.setImageDrawable(drawable);
@@ -80,7 +80,7 @@ public class RCommenViewHolder extends RecyclerView.ViewHolder {
     /**
      * 给itemView中的子View添加点击事件
      */
-    public RCommenViewHolder setOnClickListener(int viewId, View.OnClickListener listener) {
+    public RCommonViewHolder setOnClickListener(int viewId, View.OnClickListener listener) {
         View view = getView(viewId);
         view.setOnClickListener(listener);
         return this;

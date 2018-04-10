@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             android:orientation="vertical">
+
+    <com.dovar.borderradius.BorderView
+        android:id="@+id/br_1"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        app:borderOri="right_bottom"
+        />
+
+    <com.dovar.borderradius.BorderView
+        android:id="@+id/br_2"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="end"
+        app:borderOri="left_bottom"/>
+
+    <com.dovar.borderradius.BorderView
+        android:id="@+id/br_3"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="bottom"
+        app:borderOri="right_top"
+        />
+
+    <com.dovar.borderradius.BorderView
+        android:id="@+id/br_4"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="bottom|end"
+        app:borderOri="left_top"
+        />
+</FrameLayout>

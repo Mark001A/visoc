@@ -12,7 +12,7 @@ import io.reactivex.functions.Consumer;
  */
 public class PermissionManager {
 
-    private static PermissionManager permissionManager;
+    private static volatile PermissionManager permissionManager;
     private Activity activity;
 
     private PermissionManager() {

@@ -6,13 +6,17 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.support.v4.widget.Space;
 import android.os.Bundle;
+import android.support.v4.widget.Space;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.dovar.common.adapter.MultiCommonAdapter;
+import com.dovar.common.adapter.RCommonAdapter;
+import com.dovar.common.adapter.RCommonViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +25,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
 
     private PackageManager manager;
     private RecyclerView recycler;
-    private RCommenAdapter<ResolveInfo> adapter;
+    private RCommonAdapter<ResolveInfo> adapter;
     private ArrayList<String> hideApps;
 
     @Override
@@ -106,7 +110,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
             }
 
             @Override
-            public void convert(RCommenViewHolder vh, int position) {
+            public void convert(RCommonViewHolder vh, int position) {
                 ResolveInfo bean = mDatas.get(position);
                 vh.setText(R.id.tv_text, bean.loadLabel(manager).toString());
                 Log.d("test", "convert: " + bean.loadLabel(manager).toString() + bean.activityInfo);
@@ -144,7 +148,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
         adapter.addFooterView(space);
         recycler.setLayoutManager(new GridLayoutManager(this, 5));
         recycler.setAdapter(adapter);
-        adapter.setOnItemClickListener(new RCommenAdapter.OnItemClickListener<ResolveInfo>() {
+        adapter.setOnItemClickListener(new RCommonAdapter.OnItemClickListener<ResolveInfo>() {
             @Override
             public void onItemClick(ResolveInfo bean, int position) {
                 String pkg = bean.activityInfo.packageName;

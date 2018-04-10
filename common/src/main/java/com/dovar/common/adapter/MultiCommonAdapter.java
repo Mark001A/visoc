@@ -1,4 +1,4 @@
-package com.dovar.dlauncher;
+package com.dovar.common.adapter;
 
 import android.content.Context;
 import android.view.View;
@@ -11,7 +11,7 @@ import java.util.List;
  * Email:xiaohe0949@163.com
  * 通用RecyclerView多布局适配器
  */
-public abstract class MultiCommonAdapter<T> extends RCommenAdapter<T> {
+public abstract class MultiCommonAdapter<T> extends RCommonAdapter<T> {
 
     public MultiCommonAdapter(Context context, List<T> datas) {
         super(context, -1, datas);
@@ -34,16 +34,16 @@ public abstract class MultiCommonAdapter<T> extends RCommenAdapter<T> {
 
     //利用viewType返回layoutId,直接生成viewHolder
     @Override
-    public RCommenViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RCommonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
             if (getHeaderView() == null) return null;
-            return new RCommenViewHolder(getHeaderView());
+            return new RCommonViewHolder(getHeaderView());
         }
         if (viewType == TYPE_FOOTER) {
             if (getFooterView() == null) return null;
-            return new RCommenViewHolder(getFooterView());
+            return new RCommonViewHolder(getFooterView());
         }
-        return new RCommenViewHolder(View.inflate(mContext, viewType, null));
+        return new RCommonViewHolder(View.inflate(mContext, viewType, null));
     }
 
 }

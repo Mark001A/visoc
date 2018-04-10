@@ -28,4 +28,6 @@ dependencies {
     provided "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     provided files('libs/XposedBridgeApi-54.jar')
+    provided project(':common')
+
 }

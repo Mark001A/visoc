@@ -1,7 +1,6 @@
-package com.dovar.dlauncher;
+package com.dovar.common.adapter;
 
 import android.content.Context;
-import android.content.pm.ResolveInfo;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,7 +18,7 @@ import java.util.List;
  * 本类只适用于三种布局类型：TYPE_HEADER、TYPE_FOOTER、TYPE_COMMON
  * 多布局类型请使用{@link MultiCommonAdapter}
  */
-public abstract class RCommenAdapter<T> extends RecyclerView.Adapter<RCommenViewHolder> {
+public abstract class RCommonAdapter<T> extends RecyclerView.Adapter<RCommonViewHolder> {
 
     private static final String TAG = "adapter";
     protected Context mContext;
@@ -191,15 +190,15 @@ public abstract class RCommenAdapter<T> extends RecyclerView.Adapter<RCommenView
         }
     }
 
-    public abstract void convert(RCommenViewHolder vh, int position);
+    public abstract void convert(RCommonViewHolder vh, int position);
 
-    public RCommenAdapter(Context context, int layoutId, List<T> datas) {
+    public RCommonAdapter(Context context, int layoutId, List<T> datas) {
         mContext = context;
         mLayoutId = layoutId;
         mDatas = datas;
     }
 
-    public RCommenAdapter(Context context, int layoutId) {
+    public RCommonAdapter(Context context, int layoutId) {
         mContext = context;
         mLayoutId = layoutId;
         mDatas = new ArrayList<>();
@@ -207,24 +206,24 @@ public abstract class RCommenAdapter<T> extends RecyclerView.Adapter<RCommenView
 
 
     @Override
-    public RCommenViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RCommonViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == TYPE_HEADER) {
             if (headerView == null) {
                 return null;
             }
-            return new RCommenViewHolder(headerView);
+            return new RCommonViewHolder(headerView);
         }
         if (viewType == TYPE_FOOTER) {
             if (footerView == null) {
                 return null;
             }
-            return new RCommenViewHolder(footerView);
+            return new RCommonViewHolder(footerView);
         }
-        return new RCommenViewHolder(View.inflate(mContext, mLayoutId, null));
+        return new RCommonViewHolder(View.inflate(mContext, mLayoutId, null));
     }
 
     @Override
-    public void onBindViewHolder(RCommenViewHolder holder, int position) {
+    public void onBindViewHolder(RCommonViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_HEADER) return;
         if (getItemViewType(position) == TYPE_FOOTER) return;
         final int realPos;

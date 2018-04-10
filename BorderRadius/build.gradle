@@ -25,4 +25,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    provided project(':common')
+
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.larswerkman:HoloColorPicker:1.5'
 }

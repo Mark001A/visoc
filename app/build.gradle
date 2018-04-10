@@ -46,4 +46,5 @@ dependencies {
     compile project(':common')
     compile project(':launcher')
     compile project(':xposed')
+    compile project(':BorderRadius')
 }

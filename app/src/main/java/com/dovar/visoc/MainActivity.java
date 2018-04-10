@@ -71,4 +71,10 @@ public class MainActivity extends AppCompatActivity {
 //        Intent mIntent=new Intent();
 //        startActivity(mIntent);
     }
+
+    @OnClick(R.id.tv_border_radius)
+    void gotoBorderRadius(){
+        Intent mIntent = new Intent(this, com.dovar.borderradius.MainActivity.class);
+        startActivity(mIntent);
+    }
 }

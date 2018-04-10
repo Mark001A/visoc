@@ -24,4 +24,6 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    provided project(':common')
+
 }
