@@ -10,9 +10,9 @@
     tools:showIn="@layout/launcher_activity_main">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/tv_autoservice"
@@ -21,6 +21,13 @@
             android:layout_margin="@dimen/text_margin"
             android:text="autoservice"
             />
+
+        <FrameLayout
+            android:id="@+id/fl_auto_service"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </FrameLayout>
 
         <TextView
             android:id="@+id/tv_launcher"
@@ -45,6 +52,13 @@
             android:layout_margin="@dimen/text_margin"
             android:text="borderradius"
             />
+
+        <FrameLayout
+            android:id="@+id/fl_border_radius"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        </FrameLayout>
     </LinearLayout>
 
 </android.support.v4.widget.NestedScrollView>

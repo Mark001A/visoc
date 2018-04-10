@@ -36,7 +36,6 @@ public class MainActivity extends Activity implements View.OnClickListener {
         findUI();
         init();
         setRecycler();
-        setLiveWallpaper();
     }
 
     /**
@@ -113,33 +112,8 @@ public class MainActivity extends Activity implements View.OnClickListener {
             public void convert(RCommonViewHolder vh, int position) {
                 ResolveInfo bean = mDatas.get(position);
                 vh.setText(R.id.tv_text, bean.loadLabel(manager).toString());
-                Log.d("test", "convert: " + bean.loadLabel(manager).toString() + bean.activityInfo);
                 vh.setImageDrawable(R.id.iv_icon, bean.activityInfo.loadIcon(manager));
             }
-
-//            //设置item跨列
-//            @Override
-//            public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-//                super.onAttachedToRecyclerView(recyclerView);
-//                RecyclerView.LayoutManager manager = recyclerView.getLayoutManager();
-//                if (manager instanceof GridLayoutManager) {
-//                    final GridLayoutManager gridManager = ((GridLayoutManager) manager);
-//                    gridManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-//                        @Override
-//                        public int getSpanSize(int position) {
-//                            switch (getItemViewType(position)) {
-//                                case TYPE_HEADER:
-//                                case TYPE_FOOTER:
-//                                    //设置跨列
-//                                    return gridManager.getSpanCount();
-//                                default:
-//                                    return 1;
-//                            }
-//                        }
-//                    });
-//                }
-//            }
-
         };
 
         Space space = new Space(this);
@@ -159,8 +133,13 @@ public class MainActivity extends Activity implements View.OnClickListener {
                 startActivity(intent);
             }
         });
-
-
+        recycler.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View mView) {
+                setLiveWallpaper();
+                return true;
+            }
+        });
     }
 
     private void init() {
@@ -168,7 +147,7 @@ public class MainActivity extends Activity implements View.OnClickListener {
     }
 
     private void findUI() {
-        recycler = (RecyclerView) findViewById(R.id.recycler);
+        recycler = findViewById(R.id.recycler);
     }
 
     @Override

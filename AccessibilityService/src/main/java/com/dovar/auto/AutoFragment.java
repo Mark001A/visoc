@@ -10,51 +10,68 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.dovar.common.utils.ToastUtil;
+
 import static com.dovar.auto.AutoService.TAG;
 
-public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
+public class AutoFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
     private CheckBox cb_assist;
     private CheckBox cb_window;
     private CheckBox cb_lucky_money;
     private CheckBox cb_people_nearby;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.auto_activity_main);
+    private View mainView;
 
-        cb_assist = (CheckBox) findViewById(R.id.cb_assist_permission);
+
+    public static AutoFragment instance(){
+        AutoFragment mAutoFragment=new AutoFragment();
+        return mAutoFragment;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        mainView = inflater.inflate(R.layout.auto_activity_main, null);
+
+        cb_assist = (CheckBox) mainView.findViewById(R.id.cb_assist_permission);
         if (cb_assist != null) {
             cb_assist.setOnCheckedChangeListener(this);
         }
-        cb_window = (CheckBox) findViewById(R.id.cb_show_window);
+        cb_window = (CheckBox) mainView.findViewById(R.id.cb_show_window);
         if (cb_window != null) {
             cb_window.setOnCheckedChangeListener(this);
         }
-        cb_lucky_money = (CheckBox) findViewById(R.id.cb_lucky_money);
+        cb_lucky_money = (CheckBox) mainView.findViewById(R.id.cb_lucky_money);
         if (cb_lucky_money != null) {
             cb_lucky_money.setOnCheckedChangeListener(this);
         }
-        cb_people_nearby = (CheckBox) findViewById(R.id.cb_people_nearby);
+        cb_people_nearby = (CheckBox) mainView.findViewById(R.id.cb_people_nearby);
         if (cb_people_nearby != null) {
             cb_people_nearby.setOnCheckedChangeListener(this);
         }
+        return mainView;
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        updateCheckBox(cb_assist, isAccessibilitySettingsOn());
-        updateCheckBox(cb_window, canShowWindow(this));
-        if (canShowWindow(this)) {
-            requestFloatWindowPermissionIfNeeded();
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            updateCheckBox(cb_assist, isAccessibilitySettingsOn());
+            updateCheckBox(cb_window, canShowWindow(getContext()));
+            if (canShowWindow(getContext())) {
+                requestFloatWindowPermissionIfNeeded();
+            }
         }
     }
 
@@ -66,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             //打开系统设置中辅助功能
             Intent intent = new Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
-            Toast.makeText(MainActivity.this, "找到抢红包，然后开启服务即可", Toast.LENGTH_LONG).show();
+            ToastUtil.showShort("找到visoc开启服务即可");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -76,15 +93,15 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
      * 申请悬浮窗权限
      */
     private void requestFloatWindowPermissionIfNeeded() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
-            new AlertDialog.Builder(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(getContext())) {
+            new AlertDialog.Builder(getContext())
                     .setMessage(R.string.dialog_enable_overlay_window_msg)
                     .setPositiveButton(R.string.dialog_enable_overlay_window_positive_btn
                             , new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                                    intent.setData(Uri.parse("package:" + getPackageName()));
+                                    intent.setData(Uri.parse("package:" + getContext().getPackageName()));
                                     startActivity(intent);
                                     dialog.dismiss();
                                 }
@@ -93,14 +110,14 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
                             , new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    setShowWindow(MainActivity.this, false);
+                                    setShowWindow(getContext(), false);
                                     updateCheckBox(cb_window, false);
                                 }
                             })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
                         @Override
                         public void onCancel(DialogInterface dialog) {
-                            setShowWindow(MainActivity.this, false);
+                            setShowWindow(getContext(), false);
                             updateCheckBox(cb_window, false);
                         }
                     })
@@ -148,9 +165,9 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
      */
     private boolean isAccessibilitySettingsOn() {
         int accessibilityEnabled = 0;
-        String service = getPackageName() + "/" + AutoService.class.getCanonicalName();
+        String service = getContext().getPackageName() + "/" + AutoService.class.getCanonicalName();
         try {
-            accessibilityEnabled = Settings.Secure.getInt(getApplicationContext().getContentResolver(),
+            accessibilityEnabled = Settings.Secure.getInt(getContext().getApplicationContext().getContentResolver(),
                     android.provider.Settings.Secure.ACCESSIBILITY_ENABLED);
         } catch (Settings.SettingNotFoundException e) {
             Log.d(TAG, "Error finding setting, default accessibility to not found: " + e.getMessage());
@@ -158,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
         TextUtils.SimpleStringSplitter mStringColonSplitter = new TextUtils.SimpleStringSplitter(':');
 
         if (accessibilityEnabled == 1) {
-            String settingValue = Settings.Secure.getString(getApplicationContext().getContentResolver(),
+            String settingValue = Settings.Secure.getString(getContext().getApplicationContext().getContentResolver(),
                     Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES);
             if (settingValue != null) {
                 mStringColonSplitter.setString(settingValue);
@@ -180,12 +197,12 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (buttonView.getId()==R.id.cb_assist_permission){
+        if (buttonView.getId() == R.id.cb_assist_permission) {
             if (isChecked && !isAccessibilitySettingsOn()) {
                 requestAssistPermission();
             }
-        }else if (buttonView.getId()== R.id.cb_show_window){
-            setShowWindow(this, isChecked);
+        } else if (buttonView.getId() == R.id.cb_show_window) {
+            setShowWindow(getContext(), isChecked);
 
             if (isChecked) {
                 requestFloatWindowPermissionIfNeeded();
@@ -194,25 +211,25 @@ public class MainActivity extends AppCompatActivity implements CompoundButton.On
             if (!isChecked) {
                 TasksWindow.dismiss();
             } else {
-                TasksWindow.show(this, getPackageName() + "\n" + getClass().getName());
+                TasksWindow.show(getContext(), getContext().getPackageName() + "\n" + getClass().getName());
             }
-        }else if (buttonView.getId()==R.id.cb_lucky_money){
+        } else if (buttonView.getId() == R.id.cb_lucky_money) {
             if (isChecked) {
                 if (isAccessibilitySettingsOn()) {
                     AutoService.enableFunc2 = true;
                 } else {
-                    Toast.makeText(MainActivity.this, "辅助功能未开启", Toast.LENGTH_SHORT).show();
+                    ToastUtil.showShort("辅助功能未开启", Toast.LENGTH_SHORT);
                     buttonView.setChecked(false);
                 }
             } else {
                 AutoService.enableFunc2 = false;
             }
-        }else{
+        } else {
             if (isChecked) {
                 if (isAccessibilitySettingsOn()) {
                     AutoService.enableFunc3 = true;
                 } else {
-                    Toast.makeText(MainActivity.this, "辅助功能未开启", Toast.LENGTH_SHORT).show();
+                    ToastUtil.showShort("辅助功能未开启", Toast.LENGTH_SHORT);
                     buttonView.setChecked(false);
                 }
             } else {

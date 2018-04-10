@@ -23,7 +23,7 @@ public class BorderView extends View {
     private Paint mPaint;
     private Path mPath;
 
-    private int borderColor;
+    private int borderColor = Color.BLACK;
     private
     @ORI
     int mPathOri = ORI_RIGHT_BOTTOM;
@@ -55,6 +55,8 @@ public class BorderView extends View {
 
     public void setBorderColor(int mBorderColor) {
         borderColor = mBorderColor;
+        mPaint.setColor(borderColor);
+        postInvalidate();
     }
 
     private void setupPaint() {
