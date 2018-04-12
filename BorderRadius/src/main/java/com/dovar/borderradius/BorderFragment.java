@@ -11,14 +11,12 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.CheckBox;
 import android.widget.EditText;
 
 import com.dovar.common.callback.ICallback;
@@ -38,8 +36,8 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
     private View mainView;
 
 
-    public static BorderFragment instance(){
-        BorderFragment mAutoFragment=new BorderFragment();
+    public static BorderFragment instance() {
+        BorderFragment mAutoFragment = new BorderFragment();
         return mAutoFragment;
     }
 
@@ -116,24 +114,7 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
         requestFloatWindowPermissionIfNeeded(new ICallback() {
             @Override
             public void onSuccess() {
-                WindowManager sWindowManager = (WindowManager) getContext().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-                if (floatView == null) {
-                    floatView = LayoutInflater.from(getContext().getApplicationContext()).inflate(R.layout.br_float_window, null);
-                    mBorderViews[0] = floatView.findViewById(R.id.br_1);
-                    mBorderViews[1] = floatView.findViewById(R.id.br_2);
-                    mBorderViews[2] = floatView.findViewById(R.id.br_3);
-                    mBorderViews[3] = floatView.findViewById(R.id.br_4);
-                }
-                if (floatView.getParent() == null) {
-                    DisplayMetrics dm = getResources().getDisplayMetrics();
-                    WindowManager.LayoutParams sWindowParams = new WindowManager.LayoutParams(
-                            dm.widthPixels, dm.heightPixels,
-                            0, -getStatusHeight(),
-                            WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY,
-                            WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-                            PixelFormat.TRANSLUCENT);
-                    sWindowManager.addView(floatView, sWindowParams);
-                }
+                showFloatWindow();
             }
 
             @Override
@@ -141,6 +122,36 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
                 ToastUtil.showShort("没有悬浮窗权限！");
             }
         });
+    }
+
+    private void showFloatWindow() {
+        WindowManager sWindowManager = (WindowManager) getContext().getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
+        if (floatView == null) {
+            floatView = LayoutInflater.from(getContext()).inflate(R.layout.br_float_window, null);
+            mBorderViews[0] = floatView.findViewById(R.id.br_1);
+            mBorderViews[1] = floatView.findViewById(R.id.br_2);
+            mBorderViews[2] = floatView.findViewById(R.id.br_3);
+            mBorderViews[3] = floatView.findViewById(R.id.br_4);
+        }
+        if (floatView.getParent() == null) {
+            DisplayMetrics dm = getResources().getDisplayMetrics();
+            WindowManager.LayoutParams sWindowParams = new WindowManager.LayoutParams(
+                    dm.widthPixels, dm.heightPixels,
+                    0, -getStatusHeight(),
+                    WindowManager.LayoutParams.TYPE_PHONE,
+                    0x18,//多个悬浮窗时，如果flag都为WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE也会卡死
+                    //WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,//使用此flag会造成卡死
+                    PixelFormat.TRANSLUCENT);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                sWindowParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+            }
+            try {
+                sWindowManager.addView(floatView, sWindowParams);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void changeCornerColor(int color) {
@@ -189,7 +200,7 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
                                 public void onClick(DialogInterface dialog, int which) {
                                     Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
                                     intent.setData(Uri.parse("package:" + getContext().getPackageName()));
-                                    startActivity(intent);
+                                    startActivityForResult(intent, 66);
                                     dialog.dismiss();
                                 }
                             })
@@ -197,9 +208,7 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
                             , new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    if (mCallback != null) {
-                                        mCallback.onSuccess();
-                                    }
+
                                 }
                             })
                     .setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -223,5 +232,17 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
     @Override
     public void onColorChanged(int color) {
         mborderColor = color;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 66) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (Settings.canDrawOverlays(getContext())) {
+                    showFloatWindow();
+                }
+            }
+        }
     }
 }

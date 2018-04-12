@@ -35,8 +35,12 @@ public class TasksWindow {
                 WindowManager.LayoutParams sWindowParams = new WindowManager.LayoutParams(
                         WindowManager.LayoutParams.WRAP_CONTENT,
                         WindowManager.LayoutParams.WRAP_CONTENT,
-                        Build.VERSION.SDK_INT <= Build.VERSION_CODES.N ? WindowManager.LayoutParams.TYPE_TOAST : WindowManager.LayoutParams.TYPE_PHONE, 0x18,
+                        Build.VERSION.SDK_INT <= Build.VERSION_CODES.N ? WindowManager.LayoutParams.TYPE_TOAST : WindowManager.LayoutParams.TYPE_PHONE,
+                        0x18,
                         PixelFormat.TRANSLUCENT);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    sWindowParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+                }
                 sWindowParams.gravity = Gravity.START | Gravity.TOP;
                 sWindowManager.addView(infoView, sWindowParams);
             }

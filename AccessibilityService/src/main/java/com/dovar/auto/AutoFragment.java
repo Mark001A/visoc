@@ -34,8 +34,8 @@ public class AutoFragment extends Fragment implements CompoundButton.OnCheckedCh
     private View mainView;
 
 
-    public static AutoFragment instance(){
-        AutoFragment mAutoFragment=new AutoFragment();
+    public static AutoFragment instance() {
+        AutoFragment mAutoFragment = new AutoFragment();
         return mAutoFragment;
     }
 
@@ -224,7 +224,7 @@ public class AutoFragment extends Fragment implements CompoundButton.OnCheckedCh
             } else {
                 AutoService.enableFunc2 = false;
             }
-        } else {
+        } else if (buttonView.getId() == R.id.cb_people_nearby) {
             if (isChecked) {
                 if (isAccessibilitySettingsOn()) {
                     AutoService.enableFunc3 = true;
@@ -236,50 +236,6 @@ public class AutoFragment extends Fragment implements CompoundButton.OnCheckedCh
                 AutoService.enableFunc3 = false;
             }
         }
-//        switch (buttonView.getId()) {
-//            case R.id.cb_assist_permission:
-//                if (isChecked && !isAccessibilitySettingsOn()) {
-//                    requestAssistPermission();
-//                }
-//                break;
-//            case R.id.cb_show_window:
-//                setShowWindow(this, isChecked);
-//
-//                if (isChecked) {
-//                    requestFloatWindowPermissionIfNeeded();
-//                }
-//
-//                if (!isChecked) {
-//                    TasksWindow.dismiss();
-//                } else {
-//                    TasksWindow.show(this, getPackageName() + "\n" + getClass().getName());
-//                }
-//                break;
-//            case R.id.cb_lucky_money:
-//                if (isChecked) {
-//                    if (isAccessibilitySettingsOn()) {
-//                        AutoService.enableFunc2 = true;
-//                    } else {
-//                        Toast.makeText(MainActivity.this, "辅助功能未开启", Toast.LENGTH_SHORT).show();
-//                        buttonView.setChecked(false);
-//                    }
-//                } else {
-//                    AutoService.enableFunc2 = false;
-//                }
-//                break;
-//            case R.id.cb_people_nearby:
-//                if (isChecked) {
-//                    if (isAccessibilitySettingsOn()) {
-//                        AutoService.enableFunc3 = true;
-//                    } else {
-//                        Toast.makeText(MainActivity.this, "辅助功能未开启", Toast.LENGTH_SHORT).show();
-//                        buttonView.setChecked(false);
-//                    }
-//                } else {
-//                    AutoService.enableFunc3 = false;
-//                }
-//                break;
-//        }
     }
 
     private void updateCheckBox(CheckBox box, boolean isChecked) {
