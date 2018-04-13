@@ -10,7 +10,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.dovar.common.base.BaseFragment;
 import com.dovar.common.callback.ICallback;
 import com.dovar.common.utils.ToastUtil;
 import com.larswerkman.holocolorpicker.ColorPicker;
@@ -27,14 +27,11 @@ import com.larswerkman.holocolorpicker.SVBar;
 import com.larswerkman.holocolorpicker.SaturationBar;
 import com.larswerkman.holocolorpicker.ValueBar;
 
-public class BorderFragment extends Fragment implements ColorPicker.OnColorChangedListener {
+public class BorderFragment extends BaseFragment implements ColorPicker.OnColorChangedListener {
 
     private int mborderColor;
     private View floatView;
     private BorderView[] mBorderViews = new BorderView[4];
-
-    private View mainView;
-
 
     public static BorderFragment instance() {
         BorderFragment mAutoFragment = new BorderFragment();
@@ -48,7 +45,7 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
 
         createFloatWindow();
 
-        mainView.findViewById(R.id.tv_color).setOnClickListener(new View.OnClickListener() {
+        findView(R.id.tv_color).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View mView) {
                 View content = View.inflate(getContext().getApplicationContext(), R.layout.br_color_picker, null);
@@ -96,8 +93,8 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
             }
         });
 
-        SeekBar sb_size = mainView.findViewById(R.id.sb_size);
-        final TextView tv_size_num = mainView.findViewById(R.id.tv_size_num);
+        SeekBar sb_size = findView(R.id.sb_size);
+        final TextView tv_size_num = findView(R.id.tv_size_num);
         sb_size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar mSeekBar, int mI, boolean mB) {

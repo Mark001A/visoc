@@ -7,19 +7,19 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.dovar.auto.AutoFragment;
 import com.dovar.borderradius.BorderFragment;
+import com.dovar.common.base.BaseActivity;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,12 +63,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.tv_autoservice)
-    void gotoAutoService(View v) {
-//        Intent mIntent = new Intent(this, com.dovar.auto.MainActivity.class);
-//        startActivity(mIntent);
-    }
-
     @OnClick(R.id.tv_launcher)
     void gotoLauncher(View v) {
         Intent mIntent = new Intent(this, com.dovar.dlauncher.MainActivity.class);
@@ -78,12 +72,6 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.tv_xposed)
     void gotoXposed(View v) {
 //        Intent mIntent=new Intent();
-//        startActivity(mIntent);
-    }
-
-    @OnClick(R.id.tv_border_radius)
-    void gotoBorderRadius() {
-//        Intent mIntent = new Intent(this, com.dovar.borderradius.MainActivity.class);
 //        startActivity(mIntent);
     }
 

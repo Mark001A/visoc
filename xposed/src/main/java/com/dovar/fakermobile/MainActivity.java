@@ -2,19 +2,19 @@ package com.dovar.fakermobile;
 
 import android.os.Bundle;
 import android.support.annotation.Size;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.dovar.common.base.BaseActivity;
 import com.dovar.fakermobile.util.SharedPref;
 
 import java.util.HashMap;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     EditText et_imei;
     EditText et_android_id;
 

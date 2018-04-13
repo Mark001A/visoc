@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,17 +20,16 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import com.dovar.common.base.BaseFragment;
 import com.dovar.common.utils.ToastUtil;
 
 import static com.dovar.auto.AutoService.TAG;
 
-public class AutoFragment extends Fragment implements CompoundButton.OnCheckedChangeListener {
+public class AutoFragment extends BaseFragment implements CompoundButton.OnCheckedChangeListener {
     private CheckBox cb_assist;
     private CheckBox cb_window;
     private CheckBox cb_lucky_money;
     private CheckBox cb_people_nearby;
-
-    private View mainView;
 
 
     public static AutoFragment instance() {
@@ -44,19 +42,19 @@ public class AutoFragment extends Fragment implements CompoundButton.OnCheckedCh
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mainView = inflater.inflate(R.layout.auto_activity_main, null);
 
-        cb_assist = (CheckBox) mainView.findViewById(R.id.cb_assist_permission);
+        cb_assist = findView(R.id.cb_assist_permission);
         if (cb_assist != null) {
             cb_assist.setOnCheckedChangeListener(this);
         }
-        cb_window = (CheckBox) mainView.findViewById(R.id.cb_show_window);
+        cb_window = findView(R.id.cb_show_window);
         if (cb_window != null) {
             cb_window.setOnCheckedChangeListener(this);
         }
-        cb_lucky_money = (CheckBox) mainView.findViewById(R.id.cb_lucky_money);
+        cb_lucky_money = findView(R.id.cb_lucky_money);
         if (cb_lucky_money != null) {
             cb_lucky_money.setOnCheckedChangeListener(this);
         }
-        cb_people_nearby = (CheckBox) mainView.findViewById(R.id.cb_people_nearby);
+        cb_people_nearby = findView(R.id.cb_people_nearby);
         if (cb_people_nearby != null) {
             cb_people_nearby.setOnCheckedChangeListener(this);
         }
