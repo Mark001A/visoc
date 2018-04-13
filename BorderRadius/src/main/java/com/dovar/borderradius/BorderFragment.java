@@ -11,13 +11,13 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.EditText;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.dovar.common.callback.ICallback;
 import com.dovar.common.utils.ToastUtil;
@@ -47,17 +47,6 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
         mainView = inflater.inflate(R.layout.br_activity_main, null);
 
         createFloatWindow();
-
-        mainView.findViewById(R.id.tv_func).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View mView) {
-                EditText et = (EditText) mainView.findViewById(R.id.et_print);
-
-                if (et != null && !TextUtils.isEmpty(et.getText())) {
-                    changeCornerRadius(Integer.parseInt(et.getText().toString()));
-                }
-            }
-        });
 
         mainView.findViewById(R.id.tv_color).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -107,6 +96,26 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
             }
         });
 
+        SeekBar sb_size = mainView.findViewById(R.id.sb_size);
+        final TextView tv_size_num = mainView.findViewById(R.id.tv_size_num);
+        sb_size.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar mSeekBar, int mI, boolean mB) {
+                if (tv_size_num != null) {
+                    tv_size_num.setText(String.valueOf(mSeekBar.getProgress()));
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar mSeekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar mSeekBar) {
+                changeCornerRadius(mSeekBar.getProgress());
+            }
+        });
         return mainView;
     }
 
@@ -137,13 +146,14 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
             DisplayMetrics dm = getResources().getDisplayMetrics();
             WindowManager.LayoutParams sWindowParams = new WindowManager.LayoutParams(
                     dm.widthPixels, dm.heightPixels,
-                    0, -getStatusHeight(),
+                    0, -getStatusHeight() / 2,
                     WindowManager.LayoutParams.TYPE_PHONE,
-                    0x18,//多个悬浮窗时，如果flag都为WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE也会卡死
-                    //WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,//使用此flag会造成卡死
+                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS //内容会覆盖到标题栏和导航栏
+                            | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE//不使用此FLAG时悬浮窗会拦截屏幕TOUCH事件
+                            | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
                     PixelFormat.TRANSLUCENT);
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {//悬浮窗适配8.0,8.0后悬浮窗类型不得使用被标记为过时的TYPE值
                 sWindowParams.type = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
             }
             try {
@@ -155,6 +165,7 @@ public class BorderFragment extends Fragment implements ColorPicker.OnColorChang
     }
 
     private void changeCornerColor(int color) {
+        if (color == 0) return;
         if (mBorderViews != null && mBorderViews.length > 0) {
             for (BorderView bv : mBorderViews) {
                 bv.setBorderColor(color);

@@ -242,6 +242,15 @@ public abstract class RCommonAdapter<T> extends RecyclerView.Adapter<RCommonView
                 }
             });
         }
+
+        if (mOnLongItemClickListener != null) {
+            holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View mView) {
+                    return mOnLongItemClickListener.onLongItemClick(mDatas.get(realPos), realPos);
+                }
+            });
+        }
     }
 
 
@@ -280,14 +289,24 @@ public abstract class RCommonAdapter<T> extends RecyclerView.Adapter<RCommonView
         }
     }
 
-    OnItemClickListener<T> onItemClickListener;
+    private OnItemClickListener<T> onItemClickListener;
 
     public void setOnItemClickListener(OnItemClickListener<T> onItemClickListener) {
         this.onItemClickListener = onItemClickListener;
     }
 
+    private OnLongItemClickListener<T> mOnLongItemClickListener;
+
+    public void setOnLongItemClickListener(OnLongItemClickListener<T> mOnLongItemClickListener) {
+        this.mOnLongItemClickListener = mOnLongItemClickListener;
+    }
+
     public interface OnItemClickListener<T> {
         void onItemClick(T bean, int position);
+    }
+
+    public interface OnLongItemClickListener<T> {
+        boolean onLongItemClick(T bean, int position);
     }
 
 }
