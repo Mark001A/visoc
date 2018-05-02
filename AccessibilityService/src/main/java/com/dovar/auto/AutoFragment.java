@@ -29,7 +29,6 @@ public class AutoFragment extends BaseFragment implements CompoundButton.OnCheck
     private CheckBox cb_assist;
     private CheckBox cb_window;
     private CheckBox cb_lucky_money;
-    private CheckBox cb_people_nearby;
 
 
     public static AutoFragment instance() {
@@ -53,10 +52,6 @@ public class AutoFragment extends BaseFragment implements CompoundButton.OnCheck
         cb_lucky_money = findView(R.id.cb_lucky_money);
         if (cb_lucky_money != null) {
             cb_lucky_money.setOnCheckedChangeListener(this);
-        }
-        cb_people_nearby = findView(R.id.cb_people_nearby);
-        if (cb_people_nearby != null) {
-            cb_people_nearby.setOnCheckedChangeListener(this);
         }
         return mainView;
     }
@@ -221,17 +216,6 @@ public class AutoFragment extends BaseFragment implements CompoundButton.OnCheck
                 }
             } else {
                 AutoService.enableFunc2 = false;
-            }
-        } else if (buttonView.getId() == R.id.cb_people_nearby) {
-            if (isChecked) {
-                if (isAccessibilitySettingsOn()) {
-                    AutoService.enableFunc3 = true;
-                } else {
-                    ToastUtil.showShort("辅助功能未开启", Toast.LENGTH_SHORT);
-                    buttonView.setChecked(false);
-                }
-            } else {
-                AutoService.enableFunc3 = false;
             }
         }
     }
