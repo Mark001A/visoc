@@ -29,20 +29,9 @@ import java.util.Locale;
 public class AutoService extends AccessibilityService {
     public static final String TAG = "autoservice";
 
-    /**
-     * 向附近的人自动打招呼的内容
-     */
-    private String hello = "测试APP自动打招呼功能，这是一条测试信息";
 
     public static boolean enableFunc2;          //标记是否开启抢红包功能
-    public static boolean enableFunc3;          //是否开启自动添加附近的人为好友的功能;
-
     private boolean isRunning;      //是否正处于打开红包流程中
-    private boolean isBackward;     //是否刚从开完红包页面返回到聊天界面
-
-    private int i = 0;//记录已打招呼的人数
-    private int page = 1;//记录附近的人列表页码,初始页码为1
-    private int prepos = -1;//记录页面跳转来源，0--从附近的人页面跳转到详细资料页，1--从打招呼页面跳转到详细资料页
 
     private TextToSpeech mTts;
 
@@ -145,173 +134,53 @@ public class AutoService extends AccessibilityService {
                 //在微信内页但不在聊天详情页时，收到红包不会产生通知栏事件，只有系统标题栏内容发生改变
                 //标题栏中已经有微信未读消息图标时：TYPE_WINDOW_CONTENT_CHANGED	package:com.android.systemui	Class:android.widget.ImageView
                 //标题栏中尚未有未读消息图标时：TYPE_WINDOW_CONTENT_CHANGED	package:com.android.systemui	Class:android.widget.FrameLayout
-                Log.i(TAG, "EventType: " + str_eventType + "\tpackage:" + event.getPackageName() + "\tClass:" + event.getClassName() + "\t");
-                return;
             default:
                 action = event.getAction() + "";
                 break;
         }
         Log.v(TAG, "EventType: " + str_eventType + "\tAction:" + action + "\tpackage:" + event.getPackageName() + "\tClass:" + event.getClassName() + "\t");
 
-        if (enableFunc2) {          //抢红包
-            //通知栏、Toast事件
-            // TODO: 2017/10/26  MIUI9不会触发AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED
-            if (eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
-                if (event.getParcelableData() != null || event.getParcelableData() instanceof Notification) {//通知栏事件
-                    List<CharSequence> texts = event.getText();
-                    if (!texts.isEmpty()) {
-                        for (CharSequence t : texts) {
-                            String text = String.valueOf(t);
+        if (enableFunc2 && "com.tencent.mm".equals(event.getPackageName())) {//抢红包
+            Log.d(TAG, "EventType: " + str_eventType + "\tAction:" + action + "\tClass:" + event.getClassName() + "\t");
 
-                            if (text.contains("微信红包")) {
-                                isRunning = true;
-                                isBackward = false;
-                                openNotification(event);
-                            }
+            if (eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {//通知栏、Toast会触发该类型事件
+                if (event.getParcelableData() != null && event.getParcelableData() instanceof Notification) {//通知栏事件
+                    Notification nc = (Notification) event.getParcelableData();
+//                    nc.contentIntent.getCreatorPackage() ==> com.tencent.mm
+//                    event.getContentDescription() ==>null
+//                    event.getBeforeText() ==>null
+                    String text = String.valueOf(nc.tickerText);
+                    if (!isRunning && text.contains(":[微信红包]")) {
+                        isRunning = true;
+                        //点开通知栏消息
+                        PendingIntent pendingIntent = nc.contentIntent;
+                        try {
+                            pendingIntent.send();
+                        } catch (PendingIntent.CanceledException e) {
+                            e.printStackTrace();
                         }
-                    } else {
-                        Toast.makeText(this, "没有text", Toast.LENGTH_SHORT).show();
                     }
                 }
-            } else {//过滤掉通知栏和Toast事件
+            } else {
                 for (int j = 0; j < activityNames.size(); j++) {
-                    if (activityNames.get(j).equals(currentActivity)) {
+                    if (activityNames.get(j).equals(event.getClassName())) {
                         isRunning = true;
                         //当前在红包待开页面，去拆红包
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                getLuckyMoney(event);
-                            }
-                        }, 100);
+                        getLuckyMoney(event);
                         break;
                     }
                 }
 
-                if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(currentActivity)) {
+                if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(event.getClassName())) {
                     isRunning = false;
                     //拆完红包后看详细纪录的界面
 //                openNext("查看我的红包记录");
-                    isBackward = true;
                     mTts.speak("抢到红包了", TextToSpeech.QUEUE_FLUSH, null);
                 } else if ("com.tencent.mm.ui.LauncherUI".equals(currentActivity)) {
-                    //在聊天界面,去点中红包
-                    if (!isBackward) {//不是从拆完红包页返回时
-                        isRunning = true;
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                openLuckyEnvelope();
-                            }
-                        }, 100);
-                    } else {
-                        isRunning = false;
-                    }
-                    isBackward = false;
+                    //当前在聊天界面,去点中红包
+                    openLuckyEnvelope();
                 }
             }
-        }
-
-        //自动加人
-        if (enableFunc3) {
-            if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && event.getClassName().equals("com.tencent.mm.ui.LauncherUI")) {
-                //记录打招呼人数置零
-                i = 0;
-                //当前在微信聊天页就点开发现
-                openNext("发现");
-                //然后跳转到附近的人
-                openDelay(1000, "附近的人");
-            } else if (event.getClassName().equals("com.tencent.mm.plugin.nearby.ui.NearbyFriendsUI") && eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-                prepos = 0;
-                //当前在附近的人界面就点选人打招呼
-                AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
-                List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("米以内");
-                Log.d("name", "附近的人列表人数: " + list.size());
-                if (i < (list.size() * page)) {
-                    list.get(i % list.size()).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    list.get(i % list.size()).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                } else if (i == list.size() * page) {
-                    //本页已全部打招呼，所以下滑列表加载下一页，每次下滑的距离是一屏
-                    for (int i = 0; i < nodeInfo.getChild(0).getChildCount(); i++) {
-                        if (nodeInfo.getChild(0).getChild(i).getClassName().equals("android.widget.ListView")) {
-                            AccessibilityNodeInfo node_lsv = nodeInfo.getChild(0).getChild(i);
-                            node_lsv.performAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
-                            page++;
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        Thread.sleep(1000);
-                                    } catch (InterruptedException mE) {
-                                        mE.printStackTrace();
-                                    }
-                                    AccessibilityNodeInfo nodeInfo_ = getRootInActiveWindow();
-                                    List<AccessibilityNodeInfo> list_ = nodeInfo_.findAccessibilityNodeInfosByText("米以内");
-                                    Log.d("name", "列表人数: " + list_.size());
-                                    //滑动之后，上一页的最后一个item为当前的第一个item，所以从第二个开始打招呼
-                                    list_.get(1).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                    list_.get(1).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                                }
-                            }).start();
-                        }
-                    }
-                }
-            } else if (event.getClassName().equals("com.tencent.mm.plugin.profile.ui.ContactInfoUI") && eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-                if (prepos == 1) {
-                    //从打招呼界面跳转来的，则点击返回到附近的人页面
-                    performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
-                    i++;
-                } else if (prepos == 0) {
-                    //从附近的人跳转来的，则点击打招呼按钮
-                    AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
-                    if (nodeInfo == null) {
-                        Log.d(TAG, "rootWindow为空");
-                        return;
-                    }
-                    List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("打招呼");
-                    if (list.size() > 0) {
-                        list.get(list.size() - 1).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        list.get(list.size() - 1).getParent().performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    } else {
-                        //如果遇到已加为好友的则界面的“打招呼”变为“发消息"，所以直接返回上一个界面并记录打招呼人数+1
-                        performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
-                        i++;
-                    }
-                }
-            } else if (event.getClassName().equals("com.tencent.mm.ui.contact.SayHiEditUI") && eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-                //当前在打招呼页面
-                prepos = 1;
-                //输入打招呼的内容并发送
-                inputHello(hello);
-                openNext("发送");
-            }
-        }
-
-        //自动从桌面打开微信，利用微信多开助手可实现多个微信账号之间的切换
-//        if(topActivity.equals("com.huawei.android.launcher.Launcher")){
-//            openNext(event,"微信");
-//            AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
-//            nodeInfo.getChildCount();
-//            for (int i=0;i<nodeInfo.getChildCount();i++){
-//                String name=nodeInfo.getChild(i).getViewIdResourceName();
-//            }
-//        }
-    }
-
-    /**
-     * 打开通知栏消息
-     */
-    private void openNotification(AccessibilityEvent event) {
-        if (event.getParcelableData() == null || !(event.getParcelableData() instanceof Notification)) {
-            return;
-        }
-        //将通知栏消息打开
-        Notification notification = (Notification) event.getParcelableData();
-        PendingIntent pendingIntent = notification.contentIntent;
-        try {
-            pendingIntent.send();
-        } catch (PendingIntent.CanceledException e) {
-            e.printStackTrace();
         }
     }
 
@@ -350,29 +219,13 @@ public class AutoService extends AccessibilityService {
         }).start();
     }
 
-    //自动输入打招呼内容
-    private void inputHello(String hello) {
-        AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
-        //找到当前获取焦点的view
-        AccessibilityNodeInfo target = nodeInfo.findFocus(AccessibilityNodeInfo.FOCUS_INPUT);
-        if (target == null) {
-            Log.d(TAG, "inputHello: null");
-            return;
-        }
-        ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-        ClipData clip = ClipData.newPlainText("label", hello);
-        clipboard.setPrimaryClip(clip);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-            target.performAction(AccessibilityNodeInfo.ACTION_PASTE);
-        }
-    }
-
     @Override
     public void onInterrupt() {
         Toast.makeText(this, "服务已中断", Toast.LENGTH_SHORT).show();
         mTts.shutdown();
     }
 
+    //每次调用Android Device Monitor去dump view hierarchy时都会导致服务重新onServiceConnected()
     @Override
     protected void onServiceConnected() {
         super.onServiceConnected();
@@ -408,7 +261,7 @@ public class AutoService extends AccessibilityService {
 
 
     //开红包
-    private void getLuckyMoney(AccessibilityEvent event) {
+    private void getLuckyMoney(final AccessibilityEvent event) {
 //        getWindows();
 //        findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY);
 //        event.getSource();
@@ -437,7 +290,7 @@ public class AutoService extends AccessibilityService {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR2) {
             AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();  //获得整个窗口对象
             if (nodeInfo == null) {
-                Toast.makeText(this, "rootWindow为空", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "getLuckyMoney rootWindow为空", Toast.LENGTH_SHORT).show();
                 return;
             }
             //bi3是本人写代码时微信拆红包的button的id,该id可能会在更新微信版本后发生变更,可通过Android Device Monitor查看获取
@@ -469,17 +322,17 @@ public class AutoService extends AccessibilityService {
     private void openLuckyEnvelope() {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo == null) {
-            Toast.makeText(this, "rootWindow为空", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "openLuckyEnvelope rootWindow为空", Toast.LENGTH_SHORT).show();
             return;
         }
         List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("领取红包");
+        if (!"com.tencent.mm.ui.LauncherUI".equals(currentActivity)) return;
         if (list.isEmpty()) {
             openChatPage(nodeInfo);
         } else {
             //选择聊天记录中最新的红包
             for (int i = list.size() - 1; i >= 0; i--) {
                 AccessibilityNodeInfo parent = list.get(i).getParent();
-                Log.d(TAG, "-->领取红包:" + parent);
                 if (parent != null) {
                     parent.performAction(AccessibilityNodeInfo.ACTION_CLICK);
                     break;
@@ -491,7 +344,7 @@ public class AutoService extends AccessibilityService {
     //打开聊天内页
     private void openChatPage(AccessibilityNodeInfo nodeInfo) {
         //微信页能获取到4个Tab_Fragment的内容节点，但是获取不到"Tab_微信"的聊天列表item中用于显示最新一条聊天记录的那个TextView节点
-        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("[微信红包]恭喜发财，大吉大利");
+        List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("[微信红包]");
         if (!list.isEmpty()) {
             for (int j = 0; j < list.size(); j++) {
                 Log.d(TAG, "openLuckyEnvelope: " + list.get(j).getText());
