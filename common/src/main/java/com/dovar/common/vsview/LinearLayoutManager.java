@@ -7,7 +7,6 @@ import android.os.Parcelable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.accessibility.AccessibilityEventCompat;
 import android.support.v4.view.accessibility.AccessibilityRecordCompat;
-import android.support.v7.widget.LinearSmoothScroller;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -80,7 +79,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
     /**
      * This keeps the final value for how LayoutManager should start laying out views.
      * It is calculated by checking {@link #getReverseLayout()} and View's layout direction.
-     * {@link #onLayoutChildren(DRecyclerView.Recycler, DRecyclerView.State)} is run.
+     * {@link #onLayoutChildren(DRecyclerView.Recycler, State)} is run.
      */
     boolean mShouldReverseLayout = false;
 
@@ -400,7 +399,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      *
      * @return The extra space that should be laid out (in pixels).
      */
-    protected int getExtraLayoutSpace(DRecyclerView.State state) {
+    protected int getExtraLayoutSpace(State state) {
         if (state.hasTargetScrollPosition()) {
             return mOrientationHelper.getTotalSpace();
         } else {
@@ -409,7 +408,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
     }
 
     @Override
-    public void smoothScrollToPosition(DRecyclerView recyclerView, DRecyclerView.State state, int position) {
+    public void smoothScrollToPosition(DRecyclerView recyclerView, State state, int position) {
         LinearSmoothScroller linearSmoothScroller = new LinearSmoothScroller(recyclerView.getContext());
         linearSmoothScroller.setTargetPosition(position);
         startSmoothScroll(linearSmoothScroller);
@@ -433,8 +432,8 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * {@inheritDoc}
      */
     @Override
-    public void onLayoutChildren(DRecyclerView.Recycler recycler, DRecyclerView.State state) {
-        // layout algorithm:
+    public void onLayoutChildren(DRecyclerView.Recycler recycler, State state) {
+        // layout algorithm: layout逻辑：
         // 1) by checking children and other variables, find an anchor coordinate and an anchor
         //  item position.
         // 2) fill towards start, stacking from bottom
@@ -615,7 +614,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
     }
 
     @Override
-    public void onLayoutCompleted(DRecyclerView.State state) {
+    public void onLayoutCompleted(State state) {
         super.onLayoutCompleted(state);
         mPendingSavedState = null; // we don't need this anymore
         mPendingScrollPosition = NO_POSITION;
@@ -633,7 +632,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * @param firstLayoutItemDirection The direction of the first layout filling in terms of adapter
      *                                 indices.
      */
-    void onAnchorReady(DRecyclerView.Recycler recycler, DRecyclerView.State state,
+    void onAnchorReady(DRecyclerView.Recycler recycler, State state,
                        AnchorInfo anchorInfo, int firstLayoutItemDirection) {
     }
 
@@ -641,7 +640,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * If necessary, layouts new items for predictive animations
      */
     private void layoutForPredictiveAnimations(DRecyclerView.Recycler recycler,
-                                               DRecyclerView.State state, int startOffset, int endOffset) {
+                                               State state, int startOffset, int endOffset) {
         // If there are scrap children that we did not layout, we need to find where they did go
         // and layout them accordingly so that animations can work as expected.
         // This case may happen if new views are added or an existing view expands and pushes
@@ -695,7 +694,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
         mLayoutState.mScrapList = null;
     }
 
-    private void updateAnchorInfoForLayout(DRecyclerView.Recycler recycler, DRecyclerView.State state,
+    private void updateAnchorInfoForLayout(DRecyclerView.Recycler recycler, State state,
                                            AnchorInfo anchorInfo) {
         if (updateAnchorFromPendingData(state, anchorInfo)) {
             if (DEBUG) {
@@ -724,7 +723,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * If a child has focus, it is given priority.
      */
     private boolean updateAnchorFromChildren(DRecyclerView.Recycler recycler,
-                                             DRecyclerView.State state, AnchorInfo anchorInfo) {
+                                             State state, AnchorInfo anchorInfo) {
         if (getChildCount() == 0) {
             return false;
         }
@@ -765,7 +764,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * If there is a pending scroll position or saved states, updates the anchor info from that
      * data and returns true
      */
-    private boolean updateAnchorFromPendingData(DRecyclerView.State state, AnchorInfo anchorInfo) {
+    private boolean updateAnchorFromPendingData(State state, AnchorInfo anchorInfo) {
         if (state.isPreLayout() || mPendingScrollPosition == NO_POSITION) {
             return false;
         }
@@ -851,7 +850,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * @return The final offset amount for children
      */
     private int fixLayoutEndGap(int endOffset, DRecyclerView.Recycler recycler,
-                                DRecyclerView.State state, boolean canOffsetChildren) {
+                                State state, boolean canOffsetChildren) {
         int gap = mOrientationHelper.getEndAfterPadding() - endOffset;
         int fixOffset = 0;
         if (gap > 0) {
@@ -876,7 +875,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * @return The final offset amount for children
      */
     private int fixLayoutStartGap(int startOffset, DRecyclerView.Recycler recycler,
-                                  DRecyclerView.State state, boolean canOffsetChildren) {
+                                  State state, boolean canOffsetChildren) {
         int gap = startOffset - mOrientationHelper.getStartAfterPadding();
         int fixOffset = 0;
         if (gap > 0) {
@@ -1006,7 +1005,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      */
     @Override
     public int scrollHorizontallyBy(int dx, DRecyclerView.Recycler recycler,
-                                    DRecyclerView.State state) {
+                                    State state) {
         if (mOrientation == VERTICAL) {
             return 0;
         }
@@ -1018,7 +1017,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      */
     @Override
     public int scrollVerticallyBy(int dy, DRecyclerView.Recycler recycler,
-                                  DRecyclerView.State state) {
+                                  State state) {
         if (mOrientation == HORIZONTAL) {
             return 0;
         }
@@ -1026,36 +1025,36 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
     }
 
     @Override
-    public int computeHorizontalScrollOffset(DRecyclerView.State state) {
+    public int computeHorizontalScrollOffset(State state) {
         return computeScrollOffset(state);
     }
 
     @Override
-    public int computeVerticalScrollOffset(DRecyclerView.State state) {
+    public int computeVerticalScrollOffset(State state) {
         return computeScrollOffset(state);
     }
 
     @Override
-    public int computeHorizontalScrollExtent(DRecyclerView.State state) {
+    public int computeHorizontalScrollExtent(State state) {
         return computeScrollExtent(state);
     }
 
     @Override
-    public int computeVerticalScrollExtent(DRecyclerView.State state) {
+    public int computeVerticalScrollExtent(State state) {
         return computeScrollExtent(state);
     }
 
     @Override
-    public int computeHorizontalScrollRange(DRecyclerView.State state) {
+    public int computeHorizontalScrollRange(State state) {
         return computeScrollRange(state);
     }
 
     @Override
-    public int computeVerticalScrollRange(DRecyclerView.State state) {
+    public int computeVerticalScrollRange(State state) {
         return computeScrollRange(state);
     }
 
-    private int computeScrollOffset(DRecyclerView.State state) {
+    private int computeScrollOffset(State state) {
         if (getChildCount() == 0) {
             return 0;
         }
@@ -1066,7 +1065,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
                 this, mSmoothScrollbarEnabled, mShouldReverseLayout);
     }
 
-    private int computeScrollExtent(DRecyclerView.State state) {
+    private int computeScrollExtent(State state) {
         if (getChildCount() == 0) {
             return 0;
         }
@@ -1077,7 +1076,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
                 this, mSmoothScrollbarEnabled);
     }
 
-    private int computeScrollRange(DRecyclerView.State state) {
+    private int computeScrollRange(State state) {
         if (getChildCount() == 0) {
             return 0;
         }
@@ -1119,7 +1118,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
     }
 
     private void updateLayoutState(int layoutDirection, int requiredSpace,
-                                   boolean canUseExistingSpace, DRecyclerView.State state) {
+                                   boolean canUseExistingSpace, State state) {
         // If parent provides a hint, don't measure unlimited.
         mLayoutState.mInfinite = resolveIsInfinite();
         mLayoutState.mExtra = getExtraLayoutSpace(state);
@@ -1160,7 +1159,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
                 && mOrientationHelper.getEnd() == 0;
     }
 
-    int scrollBy(int dy, DRecyclerView.Recycler recycler, DRecyclerView.State state) {
+    int scrollBy(int dy, DRecyclerView.Recycler recycler, State state) {
         if (getChildCount() == 0 || dy == 0) {
             return 0;
         }
@@ -1340,7 +1339,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * @return Number of pixels that it added. Useful for scroll functions.
      */
     int fill(DRecyclerView.Recycler recycler, LayoutState layoutState,
-             DRecyclerView.State state, boolean stopOnFocusable) {
+             State state, boolean stopOnFocusable) {
         // max offset we should set is mFastScroll + available
         final int start = layoutState.mAvailable;
         if (layoutState.mScrollingOffset != LayoutState.SCROLLING_OFFSET_NaN) {
@@ -1350,7 +1349,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
             }
             recycleByLayoutState(recycler, layoutState);
         }
-        int remainingSpace = layoutState.mAvailable + layoutState.mExtra;
+        int remainingSpace = layoutState.mExtra + layoutState.mAvailable;
         LayoutChunkResult layoutChunkResult = mLayoutChunkResult;
         while ((layoutState.mInfinite || remainingSpace > 0) && layoutState.hasMore(state)) {
             layoutChunkResult.resetInternal();
@@ -1389,8 +1388,9 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
         return start - layoutState.mAvailable;
     }
 
-    void layoutChunk(DRecyclerView.Recycler recycler, DRecyclerView.State state,
+    void layoutChunk(DRecyclerView.Recycler recycler, State state,
                      LayoutState layoutState, LayoutChunkResult result) {
+        //拿到下一个itemView
         View view = layoutState.next(recycler);
         if (view == null) {
             if (DEBUG && layoutState.mScrapList == null) {
@@ -1587,7 +1587,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * @return A View that can be used an an anchor View.
      */
     private View findReferenceChildClosestToEnd(DRecyclerView.Recycler recycler,
-                                                DRecyclerView.State state) {
+                                                State state) {
         return mShouldReverseLayout ? findFirstReferenceChild(recycler, state) :
                 findLastReferenceChild(recycler, state);
     }
@@ -1604,21 +1604,21 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
      * @return A View that can be used an an anchor View.
      */
     private View findReferenceChildClosestToStart(DRecyclerView.Recycler recycler,
-                                                  DRecyclerView.State state) {
+                                                  State state) {
         return mShouldReverseLayout ? findLastReferenceChild(recycler, state) :
                 findFirstReferenceChild(recycler, state);
     }
 
-    private View findFirstReferenceChild(DRecyclerView.Recycler recycler, DRecyclerView.State state) {
+    private View findFirstReferenceChild(DRecyclerView.Recycler recycler, State state) {
         return findReferenceChild(recycler, state, 0, getChildCount(), state.getItemCount());
     }
 
-    private View findLastReferenceChild(DRecyclerView.Recycler recycler, DRecyclerView.State state) {
+    private View findLastReferenceChild(DRecyclerView.Recycler recycler, State state) {
         return findReferenceChild(recycler, state, getChildCount() - 1, -1, state.getItemCount());
     }
 
     // overridden by GridLayoutManager
-    View findReferenceChild(DRecyclerView.Recycler recycler, DRecyclerView.State state,
+    View findReferenceChild(DRecyclerView.Recycler recycler, State state,
                             int start, int end, int itemCount) {
         ensureLayoutState();
         View invalidMatch = null;
@@ -1755,7 +1755,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
 
     @Override
     public View onFocusSearchFailed(View focused, int focusDirection,
-                                    DRecyclerView.Recycler recycler, DRecyclerView.State state) {
+                                    DRecyclerView.Recycler recycler, State state) {
         resolveShouldLayoutReverse();
         if (getChildCount() == 0) {
             return null;
@@ -1901,8 +1901,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
     }
 
     /**
-     * Helper class that keeps temporary state while {LayoutManager} is filling out the empty
-     * space.
+     * Helper class that keeps temporary state while {LayoutManager} is filling out the empty space.
      */
     static class LayoutState {
 
@@ -1967,14 +1966,14 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
         int mExtra = 0;
 
         /**
-         * Equal to {@link DRecyclerView.State#isPreLayout()}. When consuming scrap, if this value
+         * Equal to {@link State#isPreLayout()}. When consuming scrap, if this value
          * is set to true, we skip removed views since they should not be laid out in post layout
          * step.
          */
         boolean mIsPreLayout = false;
 
         /**
-         * The most recent {@link #scrollBy(int, DRecyclerView.Recycler, DRecyclerView.State)}
+         * The most recent {@link #scrollBy(int, DRecyclerView.Recycler, State)}
          * amount.
          */
         int mLastScrollDelta;
@@ -1993,7 +1992,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
         /**
          * @return true if there are more items in the data adapter
          */
-        boolean hasMore(DRecyclerView.State state) {
+        boolean hasMore(State state) {
             return mCurrentPosition >= 0 && mCurrentPosition < state.getItemCount();
         }
 
@@ -2185,7 +2184,7 @@ public class LinearLayoutManager extends DRecyclerView.LayoutManager implements 
                     '}';
         }
 
-        boolean isViewValidAsAnchor(View child, DRecyclerView.State state) {
+        boolean isViewValidAsAnchor(View child, State state) {
             DRecyclerView.LayoutParams lp = (DRecyclerView.LayoutParams) child.getLayoutParams();
             return !lp.isItemRemoved() && lp.getViewLayoutPosition() >= 0
                     && lp.getViewLayoutPosition() < state.getItemCount();

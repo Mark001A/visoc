@@ -39,7 +39,7 @@ public abstract class OrientationHelper {
      * <p>
      * Make sure you call {@link #onLayoutComplete()} at the end of your LayoutManager's
      * {@link DRecyclerView.LayoutManager#onLayoutChildren(DRecyclerView.Recycler,
-     * DRecyclerView.State)} method.
+     * State)} method.
      *
      * @return The difference between the current total space and previous layout's total space.
      * @see #onLayoutComplete()

@@ -11,7 +11,7 @@ public class ScrollbarHelper {
      * @param startChild View closest to start of the list. (top or left)
      * @param endChild   View closest to end of the list (bottom or right)
      */
-    static int computeScrollOffset(DRecyclerView.State state, OrientationHelper orientation,
+    static int computeScrollOffset(State state, OrientationHelper orientation,
                                    View startChild, View endChild, DRecyclerView.LayoutManager lm,
                                    boolean smoothScrollbarEnabled, boolean reverseLayout) {
         if (lm.getChildCount() == 0 || state.getItemCount() == 0 || startChild == null ||
@@ -42,7 +42,7 @@ public class ScrollbarHelper {
      * @param startChild View closest to start of the list. (top or left)
      * @param endChild   View closest to end of the list (bottom or right)
      */
-    static int computeScrollExtent(DRecyclerView.State state, OrientationHelper orientation,
+    static int computeScrollExtent(State state, OrientationHelper orientation,
                                    View startChild, View endChild, DRecyclerView.LayoutManager lm,
                                    boolean smoothScrollbarEnabled) {
         if (lm.getChildCount() == 0 || state.getItemCount() == 0 || startChild == null ||
@@ -61,7 +61,7 @@ public class ScrollbarHelper {
      * @param startChild View closest to start of the list. (top or left)
      * @param endChild   View closest to end of the list (bottom or right)
      */
-    static int computeScrollRange(DRecyclerView.State state, OrientationHelper orientation,
+    static int computeScrollRange(State state, OrientationHelper orientation,
                                   View startChild, View endChild, DRecyclerView.LayoutManager lm,
                                   boolean smoothScrollbarEnabled) {
         if (lm.getChildCount() == 0 || state.getItemCount() == 0 || startChild == null ||
