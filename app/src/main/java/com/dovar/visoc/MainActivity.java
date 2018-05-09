@@ -11,15 +11,20 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.dovar.auto.AutoFragment;
 import com.dovar.borderradius.BorderFragment;
 import com.dovar.common.base.BaseActivity;
+import com.dovar.common.vsview.DRecyclerView;
+import com.dovar.common.vsview.LinearLayoutManager;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
+
+    DRecyclerView mDRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +45,26 @@ public class MainActivity extends BaseActivity {
 
         addFragment(AutoFragment.instance(), R.id.fl_auto_service);
         addFragment(BorderFragment.instance(), R.id.fl_border_radius);
+
+        mDRecyclerView = findView(R.id.vs_list);
+        mDRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mDRecyclerView.setAdapter(new DRecyclerView.Adapter() {
+            @Override
+            public DRecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                View item = View.inflate(mContext, R.layout.item_layout, null);
+                return new DViewHolder(item);
+            }
+
+            @Override
+            public void onBindViewHolder(DRecyclerView.ViewHolder holder, int position) {
+
+            }
+
+            @Override
+            public int getItemCount() {
+                return 10;
+            }
+        });
     }
 
     @Override
@@ -79,5 +104,12 @@ public class MainActivity extends BaseActivity {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.add(resId, child);
         ft.commit();
+    }
+
+    public static class DViewHolder extends DRecyclerView.ViewHolder {
+
+        public DViewHolder(View itemView) {
+            super(itemView);
+        }
     }
 }

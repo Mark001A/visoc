@@ -14,6 +14,13 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <com.dovar.common.vsview.DRecyclerView
+            android:id="@+id/vs_list"
+            android:layout_width="match_parent"
+            android:layout_height="400dp">
+
+        </com.dovar.common.vsview.DRecyclerView>
+
         <TextView
             android:id="@+id/tv_autoservice"
             android:layout_width="wrap_content"
