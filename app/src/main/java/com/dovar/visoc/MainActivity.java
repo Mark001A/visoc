@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import com.dovar.auto.AutoFragment;
 import com.dovar.borderradius.BorderFragment;
 import com.dovar.common.base.BaseActivity;
+import com.dovar.common.vsview.Adapter;
 import com.dovar.common.vsview.DRecyclerView;
 import com.dovar.common.vsview.LinearLayoutManager;
 
@@ -48,7 +49,7 @@ public class MainActivity extends BaseActivity {
 
         mDRecyclerView = findView(R.id.vs_list);
         mDRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mDRecyclerView.setAdapter(new DRecyclerView.Adapter() {
+        mDRecyclerView.setAdapter(new Adapter() {
             @Override
             public DRecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 View item = View.inflate(mContext, R.layout.item_layout, null);

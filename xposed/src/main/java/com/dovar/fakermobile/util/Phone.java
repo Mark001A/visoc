@@ -144,7 +144,6 @@ public class Phone {
                     @Override
                     protected void afterHookedMethod(MethodHookParam param)
                             throws Throwable {
-                        // TODO Auto-generated method stub
                         super.afterHookedMethod(param);
                         param.setResult(SharedPref.getXValue("BSSID"));
                     }

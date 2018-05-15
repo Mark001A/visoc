@@ -11,41 +11,37 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.view.accessibility.AccessibilityWindowInfo;
 import android.widget.Toast;
 
+import com.dovar.common.utils.LogUtil;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
 /**
- * 1.使用此服务需要获取手机特殊权限：部分手机点击本demo页面中“打开辅助服务”按钮进入辅助功能页即可找到名称为“抢红包”的服务，然后打开即可，
- * 其他手机需要在辅助功能中找到“无障碍”项，然后在“无障碍”中找到“抢红包”打开即可
- * note:APP获取到辅助功能权限后，一旦APP进程被强杀就会清除该权限，再次进入APP又需要重新申请，正常退出则不会
- * 2.确保手机的微信消息能在通知栏显示
  * Created by Dovar66
+ * <p>
+ * 1.使用此服务需要获取手机特殊权限：部分手机点击本demo页面中“打开辅助服务”按钮进入辅助功能页即可找到名称为“抢红包”的服务，然后打开即可，
+ * 其他手机需要在辅助功能中找到“无障碍”项，然后在“无障碍”中找到“抢红包”打开即可.
+ * 2.确保手机的微信消息能在通知栏显示.
+ * Note:APP获取到辅助功能权限后，一旦APP进程被强杀就会清除该权限，再次进入APP又需要重新申请，正常退出则不会.
  */
 public class AutoService extends AccessibilityService {
     public static final String TAG = "autoservice";
 
-
     public static boolean enableFunc2;          //标记是否开启抢红包功能
-    private boolean isRunning;      //是否正处于打开红包流程中
-
-    private TextToSpeech mTts;
-
-    private List<String> ids = Arrays.asList("bjj", "bi3", "brt", "c31");      //用于存储微信开红包按钮使用过的id，微信几乎每次版本更新都会修改此button的id
-    private List<String> activityNames = Arrays.asList("com.tencent.mm.plugin.luckymoney.ui.En_fba4b94f",
-            "com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI");      //储存微信开红包activity使用过的className，最新的微信版本更新有修改过此activity的名称
+    private TextToSpeech mTts;  //语音
+    private boolean enableTextToSpeech;
 
     private String currentActivity = "";
+    private List<String> ids = Arrays.asList("bjj", "bi3", "brt", "c31");      //用于存储微信开红包按钮使用过的id，由于代码混淆原因，不同微信版本此button的id可能不同
+
 
     @Override
     public void onAccessibilityEvent(final AccessibilityEvent event) {
         int eventType = event.getEventType();
         if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED && AutoFragment.canShowWindow(this)) {
-//            if (event.getParcelableData() != null && event.getParcelableData() instanceof Activity) {
             currentActivity = String.valueOf(event.getClassName());
-
             TasksWindow.show(this, event.getPackageName() + "\n" + event.getClassName());
-//            }
         }
 
         String str_eventType;
@@ -138,7 +134,7 @@ public class AutoService extends AccessibilityService {
         }
         Log.v(TAG, "EventType: " + str_eventType + "\tAction:" + action + "\tpackage:" + event.getPackageName() + "\tClass:" + event.getClassName() + "\t");
 
-        if (enableFunc2 && "com.tencent.mm".equals(event.getPackageName())) {//抢红包
+        if (enableFunc2 && "com.tencent.mm".equals(event.getPackageName().toString())) {//抢红包
             Log.d(TAG, "EventType: " + str_eventType + "\tAction:" + action + "\tClass:" + event.getClassName() + "\t");
 
             if (eventType == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {//通知栏、Toast会触发该类型事件
@@ -148,8 +144,7 @@ public class AutoService extends AccessibilityService {
 //                    event.getContentDescription() ==>null
 //                    event.getBeforeText() ==>null
                     String text = String.valueOf(nc.tickerText);
-                    if (!isRunning && text.contains(":[微信红包]")) {
-                        isRunning = true;
+                    if (text.contains(": [微信红包]")) {
                         //点开通知栏消息
                         PendingIntent pendingIntent = nc.contentIntent;
                         try {
@@ -161,26 +156,21 @@ public class AutoService extends AccessibilityService {
                 }
             } else {
                 if (eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
-                    for (int j = 0; j < activityNames.size(); j++) {
-                        if (activityNames.get(j).equals(event.getClassName())) {
-                            isRunning = true;
-                            //当前在红包待开页面，去拆红包
-                            getLuckyMoney(event);
-                            break;
-                        }
-                    }
-
-                    if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(event.getClassName())) {
-                        isRunning = false;
+                    if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyReceiveUI".equals(event.getClassName().toString())) {
+                        //当前在红包待开页面，去拆红包
+                        getLuckyMoney(event);
+                    } else if ("com.tencent.mm.plugin.luckymoney.ui.LuckyMoneyDetailUI".equals(event.getClassName().toString())) {
                         //拆完红包后看详细纪录的界面
-//                openNext("查看我的红包记录");
-                        mTts.speak("抢到红包了", TextToSpeech.QUEUE_FLUSH, null);
+                        if (enableTextToSpeech) {
+                            enableTextToSpeech = false;
+                            mTts.speak("抢到红包了", TextToSpeech.QUEUE_FLUSH, null);
+                        }
+//                        openNext("查看我的红包记录");
                     } else if ("com.tencent.mm.ui.LauncherUI".equals(currentActivity)) {
                         //当前在聊天界面,去点中红包
                         openLuckyEnvelope();
                     }
-                }
-                if (eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
+                } else if (eventType == AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED) {
                     if ("com.tencent.mm.ui.LauncherUI".equals(currentActivity)) {
                         //当前在聊天界面,去点中红包
                         openLuckyEnvelope();
@@ -268,9 +258,6 @@ public class AutoService extends AccessibilityService {
 
     //开红包
     private void getLuckyMoney(final AccessibilityEvent event) {
-//        getWindows();
-//        findFocus(AccessibilityNodeInfo.FOCUS_ACCESSIBILITY);
-//        event.getSource();
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             List<AccessibilityWindowInfo> nodeInfos = getWindows();
             for (AccessibilityWindowInfo window : nodeInfos
@@ -280,16 +267,17 @@ public class AutoService extends AccessibilityService {
                     break;
                 }
                 Toast.makeText(this, "getWindows()不为空", Toast.LENGTH_SHORT).show();
-                List<AccessibilityNodeInfo> list = null;
-                for (String id : ids
-                        ) {
-                    list = nodeInfo.findAccessibilityNodeInfosByViewId(id);
-                    if (list != null && list.size() > 0) {
-                        list.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                        Toast.makeText(this, "clickBy getWindows()", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                }
+//                for (String id : ids
+//                        ) {
+//                    List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByViewId(id);
+//                    if (list != null && list.size() > 0) {
+//                        list.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//                        LogUtil.d("clickBy getWindows()");
+//                        return;
+//                    }
+//                }
+
+                if (clickChild(nodeInfo)) return;
             }
         }
 
@@ -299,37 +287,36 @@ public class AutoService extends AccessibilityService {
                 Toast.makeText(this, "getLuckyMoney rootWindow为空", Toast.LENGTH_SHORT).show();
                 return;
             }
-            Log.d(TAG, "getLuckyMoney  childCount:" + nodeInfo.getChildCount());
             //bi3是本人写代码时微信拆红包的button的id,该id可能会在更新微信版本后发生变更,可通过Android Device Monitor查看获取
             //可创建一个hashMap,在微信发生版本变更时储存对应微信版本号与id值，用于适配多个微信版本
-            List<AccessibilityNodeInfo> list = null;
-            for (String id : ids
-                    ) {
-                list = nodeInfo.findAccessibilityNodeInfosByViewId(id);
-                if (list != null && list.size() > 0) {
-                    list.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                    Toast.makeText(this, "clickBy getRootInActiveWindow()", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-            }
+//            for (String id : ids
+//                    ) {
+//                List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByViewId(id);
+//                if (list != null && list.size() > 0) {
+//                    list.get(0).performAction(AccessibilityNodeInfo.ACTION_CLICK);
+//                    LogUtil.d("clickBy getRootInActiveWindow()");
+//                    return;
+//                }
+//            }
 
             //如果没找到拆红包的button，则将界面上所有子节点都点击一次
             if (clickChild(nodeInfo)) return;
-            Toast.makeText(this, "未找到开红包按钮", Toast.LENGTH_SHORT).show();
-//            getLuckyMoney(event);
+            LogUtil.d("未找到开红包按钮");
         }
     }
 
     private boolean clickChild(AccessibilityNodeInfo nodeInfo) {
         boolean clicked = false;
-        Log.d(TAG, "getLuckyMoney: " + nodeInfo.getClassName());
+        LogUtil.d("getLuckyMoney: " + nodeInfo.getClassName());
         if (nodeInfo.getChildCount() == 0) return clicked;
         for (int i = nodeInfo.getChildCount() - 1; i >= 0; i--) {
             AccessibilityNodeInfo child = nodeInfo.getChild(i);
-            if (("android.widget.Button").equals(child.getClassName())) {
+            if (("android.widget.Button").equals(child.getClassName().toString())) {
+                //已找到开红包按钮，模拟点击
                 nodeInfo.getChild(i).performAction(AccessibilityNodeInfo.ACTION_CLICK);
-                Toast.makeText(this, "clickBy android.widget.Button", Toast.LENGTH_SHORT).show();
+                LogUtil.d("clickBy android.widget.Button");
                 clicked = true;
+                enableTextToSpeech = true;
                 return clicked;
             } else {
                 if (clickChild(child)) {
@@ -344,7 +331,7 @@ public class AutoService extends AccessibilityService {
     private void openLuckyEnvelope() {
         AccessibilityNodeInfo nodeInfo = getRootInActiveWindow();
         if (nodeInfo == null) {
-            Toast.makeText(this, "openLuckyEnvelope rootWindow为空", Toast.LENGTH_SHORT).show();
+            LogUtil.d("openLuckyEnvelope rootWindow为空");
             return;
         }
         List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("领取红包");
@@ -369,7 +356,6 @@ public class AutoService extends AccessibilityService {
         List<AccessibilityNodeInfo> list = nodeInfo.findAccessibilityNodeInfosByText("[微信红包]");
         if (!list.isEmpty()) {
             for (int j = 0; j < list.size(); j++) {
-                Log.d(TAG, "openLuckyEnvelope: " + list.get(j).getText());
                 AccessibilityNodeInfo node = list.get(j);
                 while (node != null && !node.isClickable()) {
                     node = node.getParent();
@@ -379,7 +365,7 @@ public class AutoService extends AccessibilityService {
                 }
             }
         } else {
-            Log.d(TAG, "openChatPage: 没有新红包");
+            LogUtil.d("openChatPage: 没有新红包");
         }
     }
 }

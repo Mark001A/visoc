@@ -86,7 +86,7 @@ public class LinearSmoothScroller extends DRecyclerView.SmoothScroller {
      * {@inheritDoc}
      */
     @Override
-    protected void onTargetFound(View targetView, DRecyclerView.State state, DRecyclerView.SmoothScroller.Action action) {
+    protected void onTargetFound(View targetView, State state, DRecyclerView.SmoothScroller.Action action) {
         final int dx = calculateDxToMakeVisible(targetView, getHorizontalSnapPreference());
         final int dy = calculateDyToMakeVisible(targetView, getVerticalSnapPreference());
         final int distance = (int) Math.sqrt(dx * dx + dy * dy);
@@ -100,7 +100,7 @@ public class LinearSmoothScroller extends DRecyclerView.SmoothScroller {
      * {@inheritDoc}
      */
     @Override
-    protected void onSeekTargetStep(int dx, int dy, DRecyclerView.State state, DRecyclerView.SmoothScroller.Action action) {
+    protected void onSeekTargetStep(int dx, int dy, State state, DRecyclerView.SmoothScroller.Action action) {
         if (getChildCount() == 0) {
             stop();
             return;
