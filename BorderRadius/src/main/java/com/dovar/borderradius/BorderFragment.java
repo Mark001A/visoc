@@ -173,10 +173,12 @@ public class BorderFragment extends BaseFragment implements ColorPicker.OnColorC
     private void changeCornerRadius(int radius) {
         if (mBorderViews != null && mBorderViews.length > 0) {
             for (BorderView bv : mBorderViews) {
-                ViewGroup.LayoutParams lp = bv.getLayoutParams();
-                lp.width = radius;
-                lp.height = radius;
-                bv.setLayoutParams(lp);
+                if (bv != null) {
+                    ViewGroup.LayoutParams lp = bv.getLayoutParams();
+                    lp.width = radius;
+                    lp.height = radius;
+                    bv.setLayoutParams(lp);
+                }
             }
         }
     }
