@@ -78,8 +78,9 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:text="在聊天列表页时抢红包插件无效，下图为聊天列表页:"/>
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:text="在下方聊天列表页时抢红包插件无效:"/>
 
     <ImageView
         android:layout_width="wrap_content"
