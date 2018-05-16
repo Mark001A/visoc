@@ -1,6 +1,5 @@
 package com.dovar.visoc;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
@@ -18,7 +17,6 @@ import com.dovar.common.base.BaseActivity;
 import com.dovar.common.vsview.DRecyclerView;
 
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends BaseActivity {
 
@@ -86,17 +84,17 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @OnClick(R.id.tv_launcher)
+  /*  @OnClick(R.id.tv_launcher)
     void gotoLauncher(View v) {
         Intent mIntent = new Intent(this, com.dovar.dlauncher.MainActivity.class);
         startActivity(mIntent);
-    }
+    }*/
 
-    @OnClick(R.id.tv_xposed)
+/*    @OnClick(R.id.tv_xposed)
     void gotoXposed(View v) {
 //        Intent mIntent=new Intent();
 //        startActivity(mIntent);
-    }
+    }*/
 
     private void addFragment(Fragment child, @IdRes int resId) {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
