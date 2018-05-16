@@ -7,6 +7,6 @@
 
     <string name="dialog_enable_accessibility_msg">Enable my Accessibility Service in order to get current activity info on Android 5.0+</string>
     <string name="dialog_enable_accessibility_positive_btn">Enable It</string>
-    <string name="dialog_enable_overlay_window_msg">Allow permission to show window over other apps on Android 7.1.1+ </string>
-    <string name="dialog_enable_overlay_window_positive_btn">settings</string>
+    <string name="dialog_enable_overlay_window_msg">需要获取悬浮窗权限，前往开启？ </string>
+    <string name="dialog_enable_overlay_window_positive_btn">去开启</string>
 </resources>
