@@ -22,14 +22,12 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
 
-    provided "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    provided 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    provided 'com.squareup.retrofit2:retrofit:2.3.0'
-    provided 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-    provided 'com.squareup.retrofit2:converter-gson:2.3.0'
-
-    compile "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
+    implementation "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
 
 }

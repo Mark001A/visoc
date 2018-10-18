@@ -16,18 +16,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    productFlavors {
-        Touchtv_test {
-            manifestPlaceholders = [UMENG_CHANNEL_VALUE: "Touchtv_test"]
-        }
-    }
 }
 
 dependencies {
-    provided "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    provided files('libs/XposedBridgeApi-54.jar')
-    provided project(':common')
-
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    compileOnly files('libs/XposedBridgeApi-54.jar')
+    implementation project(':common')
 }
