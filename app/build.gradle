@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -21,30 +20,31 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    compile "com.android.support:design:${rootProject.ext.supportLibVersion}"
-    testCompile 'junit:junit:4.12'
+    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation "com.android.support:design:${rootProject.ext.supportLibVersion}"
+    testImplementation 'junit:junit:4.12'
     //rx
     //    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
     //    compile 'com.squareup.retrofit2:retrofit:2.3.0'
     //    compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
     //    compile 'com.squareup.retrofit2:converter-gson:2.3.0'
     //sql
-    compile 'org.greenrobot:greendao:3.2.0'
+    implementation 'org.greenrobot:greendao:3.2.0'
     //butterKnife
-    apt 'com.jakewharton:butterknife-compiler:8.4.0'
-    compile 'com.jakewharton:butterknife:8.4.0'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    implementation 'com.jakewharton:butterknife:8.4.0'
     //检测内存泄漏
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
     //图片加载
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile project(':AccessibilityService')
-    compile project(':common')
-    compile project(':launcher')
-    compile project(':xposed')
-    compile project(':BorderRadius')
+    implementation 'com.github.bumptech.glide:glide:3.7.0'
+    implementation project(':AccessibilityService')
+    implementation project(':common')
+    implementation project(':launcher')
+    implementation project(':xposed')
+    implementation project(':BorderRadius')
+    implementation project(':sub:router-api')
 }
