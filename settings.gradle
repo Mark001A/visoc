@@ -1,1 +1,1 @@
-include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher', ':BorderRadius', ':hideapp',"sub:router-api"
+include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher', ':BorderRadius', ':hideapp',"router:router-api"
