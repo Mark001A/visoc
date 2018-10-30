@@ -14,9 +14,11 @@ import com.dovar.auto.AutoFragment;
 import com.dovar.borderradius.BorderFragment;
 import com.dovar.common.base.BaseActivity;
 import com.dovar.common.vsview.DRecyclerView;
+import com.dovar.router_api.router.Router;
 
 import butterknife.ButterKnife;
 
+@com.dovar.router_annotation.Router(process = "")
 public class MainActivity extends BaseActivity {
 
     DRecyclerView mDRecyclerView;
@@ -61,6 +63,7 @@ public class MainActivity extends BaseActivity {
 //            }
 //        });
 
+        Router.instance().init(getApplication());
     }
 
 //    @Override

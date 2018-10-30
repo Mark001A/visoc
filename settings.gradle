@@ -1,1 +1,7 @@
-include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher', ':BorderRadius', ':hideapp',"router:router-api"
+include ':router-api',':router-compiler',':router-annotation'
+project(':router-api').projectDir=new File("router\\router-api")
+project(':router-compiler').projectDir=new File("router\\router-compiler")
+project(':router-annotation').projectDir=new File("router\\router-annotation")
+
+include ':app', ':AccessibilityService', ':xposed', ':common', ':launcher', ':BorderRadius', ':hideapp'
+

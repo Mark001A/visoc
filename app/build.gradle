@@ -46,5 +46,6 @@ dependencies {
     implementation project(':launcher')
     implementation project(':xposed')
     implementation project(':BorderRadius')
-//    implementation project(':sub:router-api')
+
+    implementation project(':router-api')
 }

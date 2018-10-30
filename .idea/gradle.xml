@@ -14,8 +14,9 @@
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/hideapp" />
             <option value="$PROJECT_DIR$/launcher" />
-            <option value="$PROJECT_DIR$/router" />
+            <option value="$PROJECT_DIR$/router/router-annotation" />
             <option value="$PROJECT_DIR$/router/router-api" />
+            <option value="$PROJECT_DIR$/router/router-compiler" />
             <option value="$PROJECT_DIR$/xposed" />
           </set>
         </option>
